@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Accommodation - Badplaas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+
+  <style>
+    * {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:#0f141f;
+      color:white;
+      padding:12px;
+    }
+
+    h2{
+      text-align:center;
+      margin-bottom:12px;
+      color:#00b3ff;
+    }
+
+    .card{
+      background:#1f2a36;
+      padding:14px;
+      border-radius:14px;
+      margin-bottom:12px;
+    }
+
+    .placeholder{
+      height:160px;
+      background:#455a64;
+      border-radius:12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      margin-bottom:10px;
+      font-size:13px;
+      color:#ccc;
+    }
+
+    button{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:12px;
+      background:#00b3ff;
+      color:white;
+      font-weight:bold;
+      margin-top:8px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h2>Accommodation in Badplaas</h2>
+
+<div class="card">
+  <div class="placeholder">Image Placeholder</div>
+  <h3>Hotel / Lodge Name</h3>
+  <p>Short description goes here. You can replace this with real info later.</p>
+  <p>Phone: 000 000 0000</p>
+</div>
+
+<div class="card">
+  <div class="placeholder">Image Placeholder</div>
+  <h3>Guest House Name</h3>
+  <p>Short description goes here. You can replace this with real info later.</p>
+  <p>Phone: 000 000 0000</p>
+</div>
+
+<button onclick="goHome()">? Back to Dashboard</button>
+
+<script>
+function goHome(){
+  window.location.href = "home.html";
+}
+</script>
+
+</body>
+</html>

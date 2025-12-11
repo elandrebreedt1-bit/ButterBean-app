@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<link rel="manifest" href="manifest.json">
+ 
+<meta charset="UTF-8">
+   <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#00b3ff">
+
+<title>ButterBean App</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+<style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+@keyframes festiveLights{
+  0%   { border-color:red;    box-shadow:0 0 10px red; }
+  20%  { border-color:gold;   box-shadow:0 0 10px gold; }
+  40%  { border-color:lime;   box-shadow:0 0 10px lime; }
+  60%  { border-color:cyan;   box-shadow:0 0 10px cyan; }
+  80%  { border-color:purple; box-shadow:0 0 10px purple; }
+  100% { border-color:red;    box-shadow:0 0 10px red; }
+}
+#claimStamp{
+  width:100%;
+  margin-top:12px;
+  background:linear-gradient(135deg,#00b3ff,#00e1ff);
+  font-size:16px;
+  padding:12px;
+  border-radius:16px;
+}
+
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
+body{background:#0f141f;display:flex;justify-content:center;padding:12px}
+.app{
+  width:100%;
+  max-width:480px;
+  background:#fffaf3;
+  border-radius:16px;
+  border:6px solid red;
+  animation:
+  festiveLights 3.5s infinite alternate,
+  softGlow 4s ease-in-out infinite;
+}
+header{background:#151b22;color:white;text-align:center;padding:14px}
+header img{width:140px;margin-bottom:6px}
+
+.tabs{display:flex;background:#eee}
+.tab{flex:1;padding:10px;text-align:center;font-weight:bold;cursor:pointer}
+.tab.active{background:white;border-bottom:3px solid #00b3ff;color:#00b3ff}
+
+.content{padding:12px}
+.view{display:none}
+.view.active{display:block}
+
+.subtabs{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:10px}
+.subtab{padding:7px;font-weight:bold;font-size:12px;text-align:center;background:#ddd;border-radius:8px;cursor:pointer}
+.subtab.active{background:#00b3ff;color:white}
+
+.subview{display:none}
+.subview.active{display:block}
+
+.card{background:white;border-radius:12px;padding:12px;margin-bottom:12px}
+.section-title{font-weight:bold;margin-bottom:8px;color:#00b3ff}
+
+.menu-row{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:8px 0;
+  border-bottom:1px dashed #ccc;
+}
+
+.size-buttons{display:flex;gap:6px}
+
+/* BUTTONS */
+.btn{
+  padding:6px 12px;
+  border-radius:20px;
+  border:none;
+  background:#00b3ff;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  transition:transform .12s, box-shadow .12s, background .12s;
+}
+
+.btn:active{
+  transform:scale(.92);
+  box-shadow:0 0 10px rgba(0,179,255,.8);
+  background:#0094d6;
+}
+
+.tap-flash{box-shadow:0 0 14px rgba(255,255,255,.6)}
+
+.cart{background:#003b6f;color:white;padding:12px;border-radius:12px}
+#cart-items{font-size:13px;margin:8px 0}
+
+.special-img{width:100%;max-height:320px;object-fit:contain;background:black;border-radius:10px}
+
+input{width:100%;padding:10px;border-radius:8px;border:1px solid #ccc;margin-bottom:8px}
+
+.stamps{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+.stamp{width:32px;height:32px;border-radius:50%;border:2px dashed #00b3ff}
+.stamp.filled{background:#00b3ff}
+
+/* SHAKES FIX */
+#shakes .menu-row{display:grid;grid-template-columns:1fr auto;gap:10px}
+#shakes .size-buttons{display:grid;grid-template-columns:repeat(2,80px);gap:6px}
+#shakes .btn{width:80px}
+.info-btn{
+  background:#ccc;
+  color:black;
+  border-radius:50%;
+  width:20px;
+  height:20px;
+  font-size:12px;
+  font-weight:bold;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  margin-left:6px;
+}
+/* ? PIZZA ONLY – FIXED BUTTON ALIGNMENT (SAFE) */
+#pizza .menu-row{
+  display:grid;
+  grid-template-columns: 1fr 170px;
+  align-items:center;
+  column-gap:10px;
+}
+
+/* Force left text to align nicely */
+#pizza .menu-row > span{
+  display:flex;
+  align-items:center;
+  line-height:1.2;
+}
+
+/* Force both price buttons to same width */
+
+
+#pizza .size-buttons .btn{
+  width:100px;
+}
+#pizza .size-buttons{
+  display:flex;
+  gap:6px;
+  justify-content:flex-end;
+  width:170px;
+}
+#pizza .size-buttons .btn{
+  width:80px;
+  font-size:11px;
+  padding:4px 6px;
+}
+
+/* ? BIG, CLEAR SEND WHATSAPP BUTTON (SAFE) */
+#sendOrder{
+  width:100%;
+  padding:16px !important;
+  font-size:18px !important;
+  margin-top:12px;
+  border-radius:16px;
+}
+
+/* =========================
+   FESTIVE LIGHT BORDER ?? 
+   ========================= */
+
+.festive-border{
+  position:relative;
+  border-radius:18px;
+  padding:2px;
+  background:#000;
+}
+
+.festive-border::before{
+  content:"";
+  position:absolute;
+  inset:-6px;
+  border-radius:22px;
+  background:
+    radial-gradient(circle, red 6px, transparent 7px) 0 0/30px 30px,
+    radial-gradient(circle, gold 6px, transparent 7px) 15px 0/30px 30px,
+    radial-gradient(circle, lime 6px, transparent 7px) 0 15px/30px 30px,
+    radial-gradient(circle, cyan 6px, transparent 7px) 15px 15px/30px 30px;
+  animation:lights 1.4s infinite alternate;
+  pointer-events:none;
+  z-index:-1;
+}
+
+@keyframes lights{
+  0%{filter:brightness(.8)}
+  100%{filter:brightness(1.4)}
+}
+@keyframes softGlow{
+  0%   { box-shadow: 0 0 6px currentColor; }
+  50%  { box-shadow: 0 0 22px currentColor; }
+  100% { box-shadow: 0 0 6px currentColor; }
+}
+
+/* =========================
+   FESTIVE HEADER EFFECT ?? 
+   ========================= */
+
+.festive-header{
+  position:relative;
+  overflow:hidden;
+}
+
+/* Falling snow */
+.snowflake {
+  position: fixed;
+  top: -10px;
+  color: white;
+  font-size: 12px;
+  opacity: 0.8;
+  animation: fall linear infinite;
+  pointer-events: none;
+}
+
+@keyframes fall {
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+/* Logo + hat */
+.logo-wrap{
+  position:relative;
+  display:inline-block;
+  box-shadow:0 0 18px rgba(255,0,0,.6),
+             0 0 28px rgba(0,255,0,.4),
+             0 0 40px rgba(255,215,0,.3);
+  border-radius:12px;
+  animation: logoPulse 4s ease-in-out infinite;
+}
+
+.santa-hat{
+  position:absolute;
+  top:-16px;
+  right:-10px;
+  width:40px;
+  height:28px;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 80'><path d='M5 55 Q60 -10 115 45 L95 60 Q60 30 25 60 Z' fill='red'/><rect x='20' y='55' width='80' height='15' rx='8' fill='white'/><circle cx='15' cy='60' r='8' fill='white'/></svg>");
+  background-size:contain;
+  background-repeat:no-repeat;
+  transform:rotate(12deg);
+  pointer-events:none;
+}
+
+
+
+
+
+
+/* =========================
+   FLYING SANTA SLEIGH ???? 
+   ========================= */
+
+
+
+@keyframes santaFly{
+  0%{
+    transform:translateX(-160px) translateY(0);
+  }
+  25%{
+    transform:translateX(30vw) translateY(-6px);
+  }
+  50%{
+    transform:translateX(60vw) translateY(6px);
+  }
+  75%{
+    transform:translateX(90vw) translateY(-6px);
+  }
+  100%{
+    transform:translateX(110vw) translateY(0);
+  }
+}
+
+/* Final override to show red bar at top (as in your file) */
+
+
+#generateCode{
+  width:100%;
+  margin-top:8px;
+  background:linear-gradient(135deg,#ff9800,#ffb74d);
+  font-size:14px;
+  padding:10px;
+  border-radius:14px;
+}
+/* ===========================
+   GLOBAL MENU AESTHETIC POLISH
+   (NO LAYOUT CHANGES)
+   =========================== */
+
+/* ===========================
+   UNIVERSAL MENU VISUAL POLISH
+   (MATCHES YOUR REAL ELEMENTS)
+   =========================== */
+
+/* All white menu panels */
+div[style*="background:#fff"],
+div[style*="background: white"] {
+  background: linear-gradient(180deg, #ffffff, #f4f7fb) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.18) !important;
+}
+
+/* All menu text rows */
+.menu-row,
+.menu-row span,
+div p {
+  color: #1b1b1b;
+  font-weight: 500;
+  letter-spacing: 0.2px;
+}
+
+/* ALL price / size pills (your blue buttons) */
+button {
+  background: linear-gradient(145deg, #00b3ff, #1ec9ff) !important;
+  box-shadow: 0 0 14px rgba(0,179,255,0.45) !important;
+}
+
+/* Active category buttons */
+button[style*="background"] {
+  box-shadow: 0 0 18px rgba(0,179,255,0.55) !important;
+}
+
+/* Section headers like “Classic Pizzas”, “Shakes”, etc */
+h2, h3 {
+  color: #00b3ff;
+  letter-spacing: 0.6px;
+  text-shadow: 0 0 8px rgba(0,179,255,0.25);
+}
+
+/* Dotted separators look softer */
+hr {
+  border: none;
+  border-bottom: 1px dotted rgba(0,0,0,0.2);
+}
+
+/* Cart panel (dark blue box) */
+div[style*="Total"] {
+  background: linear-gradient(180deg,#0b3a5c,#082d47) !important;
+  box-shadow: 0 16px 40px rgba(0,0,0,0.35) !important;
+}
+
+/* Loyalty main card */
+input, .loyalty-card, .loyalty-panel {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18) !important;
+  border-radius: 18px;
+}
+
+/* Global font smoothing */
+body {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+</style>
+</head>
+
+<body>
+<div class="app festive-border">
+
+<header class="festive-header">
+  
+
+  <div class="logo-wrap">
+    <img src="logo.png" class="logo-img">
+    <div class="santa-hat"></div>
+  </div>
+
+  <div class="santa-sleigh"></div>
+  <div>Fresh & Delicious Every Time</div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" data-tab="order">Order</div>
+  <div class="tab" data-tab="specials">Specials</div>
+  <div class="tab" data-tab="loyalty">Loyalty</div>
+</div>
+
+<div class="content">
+<section id="order" class="view active">
+
+<div class="subtabs">
+  <div class="subtab active" data-sub="pizza">Pizza</div>
+  <div class="subtab" data-sub="burgers">Burgers</div>
+  <div class="subtab" data-sub="toasted">Toasted</div>
+  <div class="subtab" data-sub="meals">Meals</div>
+  <div class="subtab" data-sub="chips">Chips</div>
+  <div class="subtab" data-sub="coffee">Coffee</div>
+  <div class="subtab" data-sub="shakes">Shakes</div>
+  <div class="subtab" data-sub="drinks">Drinks</div>
+</div>
+
+<!-- ============ FULL PIZZA MENU RESTORED ============ -->
+<div id="pizza" class="subview active">
+<div class="card"><div class="section-title">Classic Pizzas</div>
+
+<div class="menu-row">Margherita<div class="size-buttons">
+<button class="btn" data-name="Margherita 20cm" data-price="35">20cm R35</button>
+<button class="btn" data-name="Margherita 30cm" data-price="70">30cm R70</button>
+</div></div>
+
+<div class="menu-row">Butterbean Chicken<div class="size-buttons">
+<button class="btn" data-name="Butterbean Chicken 20cm" data-price="40">20cm R40</button>
+<button class="btn" data-name="Butterbean Chicken 30cm" data-price="80">30cm R80</button>
+</div></div>
+
+<div class="menu-row">Butterbean Bacon<div class="size-buttons">
+<button class="btn" data-name="Butterbean Bacon 20cm" data-price="40">20cm R40</button>
+<button class="btn" data-name="Butterbean Bacon 30cm" data-price="80">30cm R80</button>
+</div></div>
+
+<div class="menu-row">Pepperoni<div class="size-buttons">
+<button class="btn" data-name="Pepperoni 20cm" data-price="45">20cm R45</button>
+<button class="btn" data-name="Pepperoni 30cm" data-price="85">30cm R85</button>
+</div></div>
+
+<div class="menu-row">Regina<div class="size-buttons">
+<button class="btn" data-name="Regina 20cm" data-price="45">20cm R45</button>
+<button class="btn" data-name="Regina 30cm" data-price="90">30cm R90</button>
+</div></div>
+
+<div class="menu-row">Hawaiian<div class="size-buttons">
+<button class="btn" data-name="Hawaiian 20cm" data-price="45">20cm R45</button>
+<button class="btn" data-name="Hawaiian 30cm" data-price="90">30cm R90</button>
+</div></div>
+
+<div class="menu-row">Four Seasons<div class="size-buttons">
+<button class="btn" data-name="Four Seasons 20cm" data-price="45">20cm R45</button>
+<button class="btn" data-name="Four Seasons 30cm" data-price="90">30cm R90</button>
+</div></div>
+
+<div class="menu-row">BBQ Chicken<div class="size-buttons">
+<button class="btn" data-name="BBQ Chicken 20cm" data-price="50">20cm R50</button>
+<button class="btn" data-name="BBQ Chicken 30cm" data-price="95">30cm R95</button>
+</div></div>
+
+<div class="menu-row">BBQ Rib<div class="size-buttons">
+<button class="btn" data-name="BBQ Rib 20cm" data-price="50">20cm R50</button>
+<button class="btn" data-name="BBQ Rib 30cm" data-price="100">30cm R100</button>
+</div></div>
+
+</div>
+
+<div class="card"><div class="section-title">Deluxe Pizzas</div>
+
+<div class="menu-row">
+  <span>
+    Meat Lover
+    <span class="info-btn"
+          onclick="event.stopPropagation(); openInfo('Meat Lover', menuDescriptions['Meat Lover']);">
+      i
+    </span>
+  </span>
+  <div class="size-buttons">
+    <button class="btn" data-name="Meat Lover 20cm" data-price="60">20cm R60</button>
+    <button class="btn" data-name="Meat Lover 30cm" data-price="125">30cm R125</button>
+  </div>
+</div>
+
+<div class="menu-row">Supreme<div class="size-buttons">
+<button class="btn" data-name="Supreme 20cm" data-price="60">20cm R60</button>
+<button class="btn" data-name="Supreme 30cm" data-price="115">30cm R115</button>
+</div></div>
+
+<div class="menu-row">Mafia<div class="size-buttons">
+<button class="btn" data-name="Mafia 20cm" data-price="60">20cm R60</button>
+<button class="btn" data-name="Mafia 30cm" data-price="115">30cm R115</button>
+</div></div>
+
+<div class="menu-row">The Ranch<div class="size-buttons">
+<button class="btn" data-name="The Ranch 20cm" data-price="60">20cm R60</button>
+<button class="btn" data-name="The Ranch 30cm" data-price="115">30cm R115</button>
+</div></div>
+
+<div class="menu-row">Herbivore<div class="size-buttons">
+<button class="btn" data-name="Herbivore 20cm" data-price="65">20cm R65</button>
+<button class="btn" data-name="Herbivore 30cm" data-price="130">30cm R130</button>
+</div></div>
+
+<div class="menu-row">Carnivore<div class="size-buttons">
+<button class="btn" data-name="Carnivore 20cm" data-price="70">20cm R70</button>
+<button class="btn" data-name="Carnivore 30cm" data-price="145">30cm R145</button>
+</div></div>
+
+<div class="menu-row">Omnivore<div class="size-buttons">
+<button class="btn" data-name="Omnivore 20cm" data-price="75">20cm R75</button>
+<button class="btn" data-name="Omnivore 30cm" data-price="175">30cm R175</button>
+</div></div>
+
+</div></div>
+
+<!-- BURGERS -->
+<div id="burgers" class="subview">
+<div class="card">
+<div class="menu-row">Average Joe <button class="btn" data-price="70" data-name="Average Joe">R70</button></div>
+<div class="menu-row">Average Jane <button class="btn" data-price="70" data-name="Average Jane">R70</button></div>
+<div class="menu-row">The Big Cheese <button class="btn" data-price="75" data-name="The Big Cheese">R75</button></div>
+<div class="menu-row">The Porky <button class="btn" data-price="80" data-name="The Porky">R80</button></div>
+<div class="menu-row">The Butcher <button class="btn" data-price="120" data-name="The Butcher">R120</button></div>
+<div class="menu-row">The Trident <button class="btn" data-price="80" data-name="The Trident">R80</button></div>
+<div class="menu-row">
+  <span>
+    Magic Mushroom
+    <span class="info-btn"
+          onclick="event.stopPropagation(); openInfo('Magic Mushroom', menuDescriptions['Magic Mushroom']);">
+      i
+    </span>
+  </span>
+  <button class="btn" data-price="75" data-name="Magic Mushroom">R75</button>
+</div>
+
+</div>
+</div>
+
+<!-- TOASTED -->
+<div id="toasted" class="subview">
+<div class="card">
+<div class="menu-row">Cheese <button class="btn" data-price="15" data-name="Cheese Toasted">R15</button></div>
+<div class="menu-row">Cheese & Tomato <button class="btn" data-price="20" data-name="Cheese & Tomato Toasted">R20</button></div>
+<div class="menu-row">Ham & Cheese <button class="btn" data-price="30" data-name="Ham & Cheese Toasted">R30</button></div>
+<div class="menu-row">Ham, Cheese & Tomato <button class="btn" data-price="35" data-name="Ham Cheese Tomato Toasted">R35</button></div>
+<div class="menu-row">Bacon & Cheese <button class="btn" data-price="30" data-name="Bacon & Cheese Toasted">R30</button></div>
+<div class="menu-row">Bacon, Egg & Cheese <button class="btn" data-price="35" data-name="Bacon Egg Cheese Toasted">R35</button></div>
+<div class="menu-row">Chicken Mayo <button class="btn" data-price="35" data-name="Chicken Mayo Toasted">R35</button></div>
+</div>
+</div>
+
+<!-- MEALS -->
+<div id="meals" class="subview">
+<div class="card">
+<div class="menu-row">Ribs & Chips <button class="btn" data-price="120" data-name="Ribs & Chips">R120</button></div>
+<div class="menu-row">Buffalo Wings & Chips <button class="btn" data-price="75" data-name="Wings & Chips">R75</button></div>
+<div class="menu-row">Chicken Strips & Chips <button class="btn" data-price="65" data-name="Strips & Chips">R65</button></div>
+<div class="menu-row">Battered Hake & Chips <button class="btn" data-price="75" data-name="Hake & Chips">R75</button></div>
+<div class="menu-row">Chicken Schnitzel <button class="btn" data-price="80" data-name="Chicken Schnitzel">R80</button></div>
+<div class="menu-row">Boerewors & Chips <button class="btn" data-price="75" data-name="Boerewors & Chips">R75</button></div>
+</div>
+</div>
+
+<!-- CHIPS -->
+<div id="chips" class="subview">
+<div class="card">
+<div class="menu-row">Medium Chips <button class="btn" data-price="25" data-name="Medium Chips">R25</button></div>
+<div class="menu-row">Large Chips <button class="btn" data-price="50" data-name="Large Chips">R50</button></div>
+<div class="menu-row">Russian <button class="btn" data-price="15" data-name="Russian">R15</button></div>
+</div>
+</div>
+
+<!-- COFFEE -->
+<div id="coffee" class="subview">
+<div class="card">
+<div class="menu-row">Americano<div class="size-buttons">
+<button class="btn" data-name="Americano M" data-price="20">M R20</button>
+<button class="btn" data-name="Americano L" data-price="30">L R30</button>
+</div></div>
+
+<div class="menu-row">Cappuccino<div class="size-buttons">
+<button class="btn" data-name="Cappuccino M" data-price="25">M R25</button>
+<button class="btn" data-name="Cappuccino L" data-price="35">L R35</button>
+</div></div>
+
+<div class="menu-row">Latte<div class="size-buttons">
+<button class="btn" data-name="Latte M" data-price="25">M R25</button>
+<button class="btn" data-name="Latte L" data-price="35">L R35</button>
+</div></div>
+
+<div class="menu-row">Frappe<div class="size-buttons">
+<button class="btn" data-name="Frappe M" data-price="25">M R25</button>
+<button class="btn" data-name="Frappe L" data-price="35">L R35</button>
+</div></div>
+
+<div class="menu-row">Flat White<div class="size-buttons">
+<button class="btn" data-name="Flat White M" data-price="25">M R25</button>
+<button class="btn" data-name="Flat White L" data-price="35">L R35</button>
+</div></div>
+
+<div class="menu-row">Mocaccino<div class="size-buttons">
+<button class="btn" data-name="Mocaccino M" data-price="30">M R30</button>
+<button class="btn" data-name="Mocaccino L" data-price="40">L R40</button>
+</div></div>
+</div>
+</div>
+
+<!-- SHAKES -->
+<div id="shakes" class="subview">
+<div class="card">
+<div class="menu-row">Chocolate<div class="size-buttons">
+<button class="btn" data-name="Chocolate Shake M" data-price="25">M R25</button>
+<button class="btn" data-name="Chocolate Shake L" data-price="35">L R35</button>
+</div></div>
+
+<div class="menu-row">Strawberry<div class="size-buttons">
+<button class="btn" data-name="Strawberry Shake M" data-price="25">M R25</button>
+<button class="btn" data-name="Strawberry Shake L" data-price="35">L R35</button>
+</div></div>
+
+<div class="menu-row">Banana<div class="size-buttons">
+<button class="btn" data-name="Banana Shake M" data-price="25">M R25</button>
+<button class="btn" data-name="Banana Shake L" data-price="35">L R35</button>
+</div></div>
+
+<div class="menu-row">Bubblegum<div class="size-buttons">
+<button class="btn" data-name="Bubblegum Shake M" data-price="25">M R25</button>
+<button class="btn" data-name="Bubblegum Shake L" data-price="35">L R35</button>
+</div></div>
+
+<div class="menu-row">Cookies & Cream<div class="size-buttons">
+<button class="btn" data-name="Cookies & Cream Shake M" data-price="25">M R25</button>
+<button class="btn" data-name="Cookies & Cream Shake L" data-price="35">L R35</button>
+</div></div>
+
+<div class="menu-row">Salted Caramel<div class="size-buttons">
+<button class="btn" data-name="Salted Caramel Shake M" data-price="25">M R25</button>
+<button class="btn" data-name="Salted Caramel Shake L" data-price="35">L R35</button>
+</div></div>
+
+<div class="menu-row">Rum & Raisin<div class="size-buttons">
+<button class="btn" data-name="Rum & Raisin Shake M" data-price="25">M R25</button>
+<button class="btn" data-name="Rum & Raisin Shake L" data-price="35">L R35</button>
+</div></div>
+</div>
+</div>
+
+<!-- DRINKS -->
+<div id="drinks" class="subview">
+<div class="card">
+<div class="menu-row">Coca-Cola <button class="btn" data-price="15" data-name="Coke">R15</button></div>
+<div class="menu-row">Fanta <button class="btn" data-price="15" data-name="Fanta">R15</button></div>
+<div class="menu-row">Sprite <button class="btn" data-price="15" data-name="Sprite">R15</button></div>
+<div class="menu-row">Powerade <button class="btn" data-price="15" data-name="Powerade">R15</button></div>
+<div class="menu-row">Stoney <button class="btn" data-price="15" data-name="Stoney">R15</button></div>
+<div class="menu-row">Water <button class="btn" data-price="15" data-name="Water">R15</button></div>
+</div>
+</div>
+
+<div class="cart">
+<strong>Cart</strong>
+<div id="cart-items">Empty</div>
+<div id="cart-total">Total: R0</div>
+<button class="btn" id="sendOrder">Send WhatsApp</button>
+</div>
+
+</section>
+
+<!-- SPECIALS -->
+<section id="specials" class="view">
+<div class="card">
+<img src="softserve.png" class="special-img">
+<button class="btn" data-name="Soft Serve" data-price="10">R10</button>
+</div>
+</section>
+
+<!-- LOYALTY -->
+<section id="loyalty" class="view">
+<div class="card">
+<input id="lname" placeholder="Full Name">
+<input id="lphone" placeholder="Phone Number">
+<button class="btn" id="unlock">Unlock Loyalty</button>
+
+
+
+<div id="loyalty-area" style="display:none">
+<div class="stamps" id="stampRow"></div>
+<button class="btn" id="addStamp">+ Add Stamp</button>
+<button class="btn" id="resetStamp">Reset</button>
+<button class="btn" id="claimStamp">Claim Stamp</button>
+
+</div>
+</div>
+</section>
+
+</div></div>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAG_RsdqHCslRR-xW2-3GrEKXn-UYAECYY",
+  authDomain: "butterbean-3869c.firebaseapp.com",
+  projectId: "butterbean-3869c",
+  storageBucket: "butterbean-3869c.firebasestorage.app",
+  messagingSenderId: "329727412036",
+  appId: "1:329727412036:web:7e41bebb8094fb70847911"
+};
+
+firebase.initializeApp(firebaseConfig);
+window.db = firebase.firestore();
+
+// First-time loyalty prompt
+if (!localStorage.getItem("butterbean_seen_loyalty_prompt")) {
+  setTimeout(() => {
+    alert("Welcome to ButterBean! ?\n\nEvery coffee you buy qualifies for a FREE loyalty stamp!\nCollect 9 stamps to earn your reward.\n\nTap 'Loyalty' to unlock your stamp card.");
+    localStorage.setItem("butterbean_seen_loyalty_prompt", "yes");
+  }, 1200);
+}
+const cart=[];
+let stamps = Number(localStorage.getItem("butterbean_stamps")) || 0;
+document.addEventListener("DOMContentLoaded", () => {
+  if (stamps > 0) {
+    document.getElementById("loyalty-area").style.display = "block";
+    renderStamps();
+  }
+});
+
+const STAFF_PIN="19422";
+
+function renderCart(){
+  let total=0,html="";
+  cart.forEach((i,index)=>{
+    total+=i.p;
+    html+=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+      <span>${i.n} - R${i.p}</span>
+      <button class="btn remove-btn" data-index="${index}">X</button>
+    </div>`;
+  });
+  document.getElementById("cart-items").innerHTML=html||"Cart is empty";
+  document.getElementById("cart-total").innerText="Total: R"+total;
+}
+
+document.addEventListener("click",e=>{
+  if(e.target.classList.contains("btn")){
+    e.target.classList.add("tap-flash");
+    setTimeout(()=>e.target.classList.remove("tap-flash"),120);
+  }
+
+  if(e.target.dataset.price){
+  const itemName = e.target.dataset.name;
+  cart.push({n:itemName,p:Number(e.target.dataset.price)});
+  renderCart();
+
+  // Coffee loyalty + auto-suggest
+  const isCoffee =
+    itemName.toLowerCase().includes("americano") ||
+    itemName.toLowerCase().includes("cappuccino") ||
+    itemName.toLowerCase().includes("latte") ||
+    itemName.toLowerCase().includes("flat white") ||
+    itemName.toLowerCase().includes("mocaccino") ||
+    itemName.toLowerCase().includes("frappe");
+
+  if (isCoffee) {
+    const remaining = 9 - stamps;
+
+    if (remaining > 1) {
+      showToast(`? Coffee qualifies for a stamp! Only ${remaining - 1} more to get a FREE reward.`);
+    } else if (remaining === 1) {
+      showToast("?? This coffee earns your FINAL stamp for a FREE reward!");
+    } else {
+      showToast("?? Free reward unlocked! Ask staff to reset your card.");
+    }
+  }
+}
+
+
+  if(e.target.classList.contains("remove-btn")){
+    const idx=e.target.dataset.index;
+    if(idx!==undefined){
+      cart.splice(idx,1);
+      renderCart();
+    }
+  }
+});
+
+document.querySelectorAll(".tab").forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".view").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    document.getElementById(t.dataset.tab).classList.add("active");
+  };
+});
+
+document.querySelectorAll(".subtab").forEach(t=>{
+  t.onclick=()=>{
+    document.querySelectorAll(".subtab").forEach(x=>x.classList.remove("active"));
+    document.querySelectorAll(".subview").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    document.getElementById(t.dataset.sub).classList.add("active");
+  };
+});
+
+function renderStamps(){
+  localStorage.setItem("butterbean_stamps", stamps);
+  const row=document.getElementById("stampRow");
+  row.innerHTML="";
+  for(let i=0;i<9;i++){
+    const d=document.createElement("div");
+    d.className="stamp"+(i<stamps?" filled":"");
+    row.appendChild(d);
+  }
+}
+
+document.getElementById("unlock").onclick=()=>{
+  if(!lname.value||!lphone.value){alert("Enter name & number");return;}
+  document.getElementById("loyalty-area").style.display="block";
+  renderStamps();
+};
+
+document.getElementById("addStamp").onclick = function () {
+  const pin = prompt("Enter staff PIN to add stamp:");
+  if (pin !== STAFF_PIN) {
+    alert("Wrong PIN");
+    return;
+  }
+
+  if (stamps < 9) {
+    stamps++;
+    renderStamps();
+  }
+};
+
+document.getElementById("resetStamp").onclick=()=>{
+  if(prompt("PIN")!==STAFF_PIN)return alert("Wrong PIN");
+  stamps=0;
+  renderStamps();
+};
+
+/* WHATSAPP ORDERING (FINAL SAFE VERSION) */
+const WHATSAPP_NUMBER = "27723168097";
+
+document.getElementById("sendOrder").onclick = async function () {
+  if (cart.length === 0) {
+    alert("Cart is empty");
+    return;
+  }
+
+  const customerName = prompt("Please enter your name:");
+  if (!customerName) return alert("Name is required.");
+
+  const customerPhone = prompt("Please enter your phone number:");
+  if (!customerPhone) return alert("Phone number is required.");
+
+  const pickupTime = prompt("What time will you collect the order?");
+  if (!pickupTime) return alert("Pickup time is required.");
+
+  let total = 0;
+  let msg = "ButterBean Order:\n\n";
+  msg += "Name: " + customerName + "\n";
+  msg += "Phone: " + customerPhone + "\n";
+  msg += "Pickup Time: " + pickupTime + "\n\n";
+  msg += "Items:\n";
+
+  cart.forEach(item => {
+    msg += item.n + " - R" + item.p + "\n";
+    total += item.p;
+  });
+
+  msg += "\nTotal: R" + total;
+
+  const encodedMsg = encodeURIComponent(msg);
+  const url = "https://wa.me/" + WHATSAPP_NUMBER + "?text=" + encodedMsg;
+// SAVE ORDER TO FIRESTORE (STATUS = RECEIVED)
+try {
+  await db.collection("orders").add({
+    customerName: customerName,
+    phone: customerPhone,
+    pickupTime: pickupTime,
+    items: cart,
+    total: total,
+    status: "received",
+    created: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  console.log("Order saved to Firestore");
+} catch (e) {
+  console.error("Order save failed:", e);
+  alert("Order could not be saved. Please try again.");
+  return; // STOP if Firebase failed
+}
+
+
+  window.location.href = url;
+};
+
+
+
+/* ===========================
+   MENU DESCRIPTIONS SYSTEM
+   =========================== */
+
+const menuDescriptions = {
+  "Average Joe": "A true classic! 100% beef patty on a toasted sesame bun with crisp lettuce, ripe tomato, gherkins, melted American cheese and our signature Butterbean relish.",
+  "Average Jane": "Flame-grilled chicken breast on a toasted sesame bun with lettuce, tomato, gherkins, creamy Butterbean mayo and a slice of American cheese – simple, fresh and full of flavour.",
+  "The Big Cheese": "For the cheese lovers! Juicy beef patty on a toasted sesame bun topped with lettuce, tomato, gherkin and our rich, creamy Butterbean cheese sauce.",
+  "The Porky": "Smokey, crispy bacon meets a juicy beef patty on a toasted sesame bun with lettuce, tomato, gherkin and melted American cheese topped with our Butterbean relish. Bacon makes everything better!",
+  "The Butcher": "Double the beef, double the cheese! Two juicy 100% beef patties stacked high with melted American cheese and our smokey BBQ mayo on a toasted sesame bun.",
+  "The Trident": "A seaside twist on a classic! Crispy beer-battered hake fillet on a toasted sesame bun with lettuce, tomato, gherkins and our creamy Butterbean mayo. Fresh, crunchy and full of flavour.",
+  "Magic Mushroom": "A Butterbean favourite – juicy beef patty on a toasted sesame bun with melted American cheese and our creamy, indulgent mushroom sauce. Pure magic in every bite.",
+
+  "Margherita": "Marinara sauce topped with crisp onions, sweet green peppers and melted mozzarella cheese – simple, fresh, perfect.",
+  "Butterbean Chicken": "Tender BBQ chicken with green peppers and onions, smothered in mozzarella cheese for that smokey Butterbean flavour.",
+  "Butterbean Bacon": "Crispy bacon with peppadews and onions, all blanketed in gooey mozzarella cheese – a smokey-sweet favourite.",
+  "Pepperoni": "Spicy pepperoni with zingy peppadews, onions, and golden mozzarella. Bold and full of flavour.",
+  "Regina": "Diced ham or bacon with mushrooms, onions, and garlic under layers of creamy mozzarella cheese.",
+  "Hawaiian": "Classic and cheerful – diced ham or bacon with pineapple, onions and rich mozzarella cheese.",
+  "Four Seasons": "A taste of variety – diced ham with mushrooms, black olives, green peppers, and mozzarella cheese.",
+  "BBQ Chicken": "BBQ chicken with mushroom or pineapple, onions, garlic, and mozzarella cheese finished with a swirl of BBQ sauce.",
+  "BBQ Rib": "Deboned rib with mushrooms or pineapple, onions, garlic, and mozzarella, topped with a rich BBQ sauce swirl.",
+
+  "Meat Lover": "Bacon, ham, BBQ chicken, pepperoni, ground beef, garlic, onions and mozzarella – a true feast for meat lovers.",
+  "Supreme": "BBQ chicken, ham, bacon, black olives, green peppers, mushrooms, and mozzarella cheese – every bite’s a surprise.",
+  "Mafia": "A bold mix of bacon, ham, black olives, garlic, onions, mozzarella and cheddar cheese. Rich, smokey, and unforgettable.",
+  "The Ranch": "Bacon and BBQ chicken with mushrooms, onions, green peppers, peppadews, garlic and mozzarella cheese – topped with our signature Butterbean ranch sauce.",
+  "Herbivore": "A garden’s delight – black olives, onions, green peppers, mushrooms, peppadews, garlic, tomato slices, mozzarella, cheddar and feta cheese.",
+  "Carnivore": "Hearty ham and bacon with pepperoni, BBQ chicken, ground beef and BBQ rib topped with mozzarella and feta cheese.",
+  "Omnivore": "The best of everything – ham, bacon, BBQ chicken, ground beef, pepperoni, BBQ rib, mushrooms, black olives, green peppers, peppadews, onions, mozzarella and feta cheese.",
+
+  "Ribs & Chips": "500g char-grilled, smokey pork ribs glazed with our secret basting, served with chips and crispy onion rings.",
+  "Wings & Chips": "8 crispy wings dunked in your choice of BBQ or original garlic sauce, served with chips and crispy onion rings.",
+  "Strips & Chips": "Tender, golden-fried chicken strips served with chips and crispy onion rings – simple and delicious.",
+  "Hake & Chips": "Golden beer-battered hake, light and flaky, served with fresh chips, a slice of lemon and our creamy Butterbean tat-tat sauce.",
+  "Chicken Schnitzel": "Crispy crumbed chicken breast topped with a creamy cheddar melt sauce, served with chips and crispy onion rings.",
+  "Boerewors & Chips": "160g juicy flame-grilled boerewors served with chips, a fried egg and our signature Butterbean relish."
+};
+
+// Auto-add ?? buttons
+document.querySelectorAll(".menu-row").forEach(row=>{
+  const button = row.querySelector("[data-name]");
+  if(!button) return;
+
+  let name = button.dataset.name
+  .replace(" 20cm","")
+  .replace(" 30cm","")
+  .replace(" M","")
+  .replace(" L","")
+  .replace("’","")   // remove apostrophes
+  .replace("'","")
+  .trim();
+
+   const key = Object.keys(menuDescriptions).find(k => k.toLowerCase() === name.toLowerCase());
+if(key){
+
+    // Prevent duplicates
+    if(row.querySelector(".info-btn")) return;
+
+    const titleSpan = document.createElement("span");
+    titleSpan.style.display="flex";
+    titleSpan.style.alignItems="center";
+    titleSpan.style.gap="6px";
+
+    // Extract text node (item name)
+    const textNode = [...row.childNodes].find(n => n.nodeType === 3 && n.textContent.trim());
+    titleSpan.appendChild(document.createTextNode(textNode.textContent.trim()));
+
+    const info = document.createElement("span");
+    info.innerText="i";
+    info.className="info-btn";
+    info.onclick=(e)=>{
+      e.stopPropagation();
+      openInfo(key,menuDescriptions[key]);
+    };
+
+    titleSpan.appendChild(info);
+
+    // Replace left-side label with new wrapped label
+    if(textNode){
+      textNode.remove();
+    }
+    row.prepend(titleSpan);
+  }
+});
+
+function openInfo(title,desc){
+  document.getElementById("infoTitle").innerText=title;
+  document.getElementById("infoDesc").innerText=desc;
+  document.getElementById("infoModal").style.display="flex";
+}
+
+function closeInfo(){
+  document.getElementById("infoModal").style.display="none";
+}
+function showToast(msg){
+  const toast = document.getElementById("toast");
+  toast.innerText = msg;
+  toast.style.opacity = "1";
+  toast.style.transform = "translateX(-50%) translateY(-10px)";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(-50%) translateY(0)";
+  }, 2800);
+}
+document.getElementById("claimStamp").onclick = async function () {
+  const code = prompt("Enter your 6-digit stamp code:");
+  if (!code) return;
+
+  try {
+    const snap = await db.collection("stamp_codes")
+      .where("code", "==", code)
+      .where("used", "==", false)
+      .get();
+
+    if (snap.empty) {
+      alert("? Invalid or already used code.");
+      return;
+    }
+
+    const doc = snap.docs[0];
+
+    // Mark code as used
+    await db.collection("stamp_codes").doc(doc.id).update({
+      used: true,
+      usedAt: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    // Add stamp locally
+    if (stamps < 9) {
+      stamps++;
+      localStorage.setItem("butterbean_stamps", stamps);
+      renderStamps();
+      alert("? Stamp successfully added!");
+    }
+
+  } catch (err) {
+    console.error(err);
+    alert("?? Network error. Please try again.");
+  }
+};
+document.getElementById("generateCode").onclick = async function () {
+  const pin = prompt("Enter STAFF PIN to generate code:");
+  if (pin !== STAFF_PIN) {
+    alert("? Wrong staff PIN");
+    return;
+  }
+
+  // Generate random 6-digit code
+  const newCode = Math.floor(100000 + Math.random() * 900000).toString();
+
+  try {
+    await db.collection("stamp_codes").add({
+      code: newCode,
+      used: false,
+      created: firebase.firestore.FieldValue.serverTimestamp()
+    });
+
+    alert("? New Stamp Code Generated:\n\n" + newCode + "\n\nGive this to the customer.");
+
+  } catch (err) {
+    console.error(err);
+    alert("?? Failed to generate code. Check connection.");
+  }
+};
+
+</script>
+<!-- INFO POPUP MODAL -->
+<!-- INFO POPUP MODAL -->
+<div id="infoModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.7); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:white; padding:16px; border-radius:12px; max-width:320px; width:90%;">
+    <h3 id="infoTitle" style="margin-bottom:8px;color:#00b3ff;"></h3>
+    <p id="infoDesc" style="font-size:14px; line-height:1.4;"></p>
+    <br>
+    <button class="btn" onclick="closeInfo()">Close</button>
+  </div>
+</div>
+
+<!-- Toast bubble -->
+<div id="toast" style="
+  position:fixed;
+  bottom:18px;
+  left:50%;
+  transform:translateX(-50%);
+  background:#00b3ff;
+  color:white;
+  padding:12px 18px;
+  border-radius:20px;
+  font-size:13px;
+  box-shadow:0 6px 18px rgba(0,0,0,.3);
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .3s, transform .3s;
+  z-index:99999;
+"></div>
+
+<script>
+// Register service worker
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("service-worker.js")
+    .then(() => console.log("Service Worker Registered"))
+    .catch(err => console.log("Service Worker Failed:", err));
+}
+
+// Simple falling snow like on home page
+function createSnow() {
+  const snow = document.createElement("div");
+  snow.className = "snowflake";
+  snow.style.left = Math.random() * 100 + "vw";
+  snow.style.animationDuration = (Math.random() * 3 + 2) + "s";
+  snow.textContent = "•";
+  document.body.appendChild(snow);
+
+  setTimeout(() => {
+    snow.remove();
+  }, 5000);
+}
+
+setInterval(createSnow, 300);
+</script>
+
+</body>
+</html>

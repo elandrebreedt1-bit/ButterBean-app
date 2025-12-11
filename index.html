@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <title>Install ButterBean App</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- ✅ THIS LINE WAS MISSING (THIS IS THE MAIN FIX) -->
+  <link rel="manifest" href="/manifest.json">
+  <meta name="theme-color" content="#00b3ff">
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0f141f, #1b2233);
+      font-family: Arial, Helvetica, sans-serif;
+      color: white;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .card {
+      background: #ffffff;
+      color: #000;
+      padding: 30px 22px;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.4);
+    }
+
+    .logo {
+      width: 220px;
+      max-width: 90%;
+      margin-bottom: 20px;
+    }
+
+    h2 {
+      margin: 10px 0;
+      color: #00b3ff;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.5;
+      margin-bottom: 20px;
+      opacity: 0.9;
+    }
+
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      border-radius: 14px;
+      border: none;
+      background: #00b3ff;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+
+    .hint {
+      font-size: 13px;
+      opacity: 0.8;
+      margin-top: 6px;
+    }
+
+    .goApp {
+      margin-top: 20px;
+      background: #4caf50;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="card">
+    <img src="icons/logo.png" class="logo" alt="ButterBean">
+
+    <h2>Install the ButterBean App</h2>
+
+    <p>
+      Get quick access to our full menu, daily specials, and easy ordering.
+      Install the app in one tap.
+    </p>
+
+    <button id="installBtn" style="display:none;">Install App</button>
+
+    <div class="hint">
+      If the install button does not appear, tap the 3 dots in your browser and select
+      <b>"Add to Home Screen"</b>.
+    </div>
+
+    <button class="goApp" onclick="goToApp()">Open Without Installing</button>
+  </div>
+
+<script>
+  // ✅ Correct redirect for your current app structure
+  if (
+    window.matchMedia('(display-mode: standalone)').matches ||
+    window.navigator.standalone === true
+  ) {
+    window.location.replace("app.html");
+  }
+
+  let deferredPrompt;
+  const installBtn = document.getElementById("installBtn");
+
+  window.addEventList
+

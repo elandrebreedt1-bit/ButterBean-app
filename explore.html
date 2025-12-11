@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Explore Badplaas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <style>
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+    body{
+      margin:0;
+      font-family:Arial;
+      background:#0f141f;
+      color:white;
+      padding:12px;
+    }
+
+    .card{
+      background:#1f2a36;
+      padding:14px;
+      border-radius:14px;
+      margin-bottom:12px;
+    }
+
+    img{
+      width:100%;
+      border-radius:12px;
+      margin-bottom:8px;
+    }
+
+    button{
+      width:100%;
+      padding:12px;
+      border:none;
+      border-radius:12px;
+      background:#00b3ff;
+      color:white;
+      font-weight:bold;
+      margin-top:8px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <img src="badplaas-waterpark.jpg">
+  <h3>Things To Do</h3>
+  <p>Hot springs, waterpark, hiking, mountain views.</p>
+</div>
+
+<div class="card">
+  <img src="hospital.jpg">
+  <h3>Emergency Numbers</h3>
+  <p>Police: 10111<br>Ambulance: 10177<br>Fire: 112</p>
+</div>
+
+<div class="card">
+  <img src="accommodation.jpg">
+  <h3>Accommodation</h3>
+  <p>Local lodges, guest houses and resorts.</p>
+</div>
+
+<button onclick="goHome()">? Back to Home</button>
+
+<script>
+function goHome(){
+  window.location.href="home.html";
+}
+</script>
+
+</body>
+</html>
