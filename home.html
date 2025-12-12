@@ -1,4 +1,4 @@
-<<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -21,11 +21,12 @@ html, body {
   margin: 0;
   padding: 0;
 }
+
 body {
-  margin: 0;
   font-family: Arial, sans-serif;
   background: linear-gradient(180deg, #2d0b00, #3b1200);
   color: #fff;
+  margin: 0;
 }
 
 /* HEADER */
@@ -103,6 +104,7 @@ body {
 .home-btn:active {
   transform: scale(0.96);
 }
+
 .tagline {
   font-size: 13px;
   letter-spacing: 1.2px;
@@ -132,8 +134,9 @@ body {
   Loading today’s special...
 </div>
 
+<!-- ✅ CLEAN, FIXED GRID WITH ALL BUTTONS -->
 <div class="grid">
-  <!-- ✅ FIXED: MENU NOW GOES TO app.html -->
+
   <button class="home-btn" onclick="location.href='app.html'">
     <img src="icons/menu.png" width="24"><br>Menu
   </button>
@@ -149,6 +152,12 @@ body {
   <button class="home-btn" onclick="location.href='emergency.html'">
     <img src="icons/emergency.png" width="24"><br>Emergency
   </button>
+
+  <!-- ⭐ YOUR POS BUTTON ADDED CORRECTLY -->
+  <button class="home-btn" onclick="location.href='pos.html'">
+    <img src="icons/pos.png" width="24"><br>POS
+  </button>
+
 </div>
 
 <img src="icons/festive.png" style="width:90%; max-width:400px; display:block; margin:30px auto 10px;">
@@ -157,6 +166,7 @@ body {
   Built with love in Badplaas
 </div>
 
+<!-- FIREBASE + DAILY SPECIAL -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -173,7 +183,6 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// LOAD TODAY'S SPECIAL SAFELY
 const banner = document.getElementById("specialBanner");
 
 try {
