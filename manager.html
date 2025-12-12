@@ -1,286 +1,44 @@
-<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>ButterBean Manager</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-
-<style>
-*{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:Arial,Helvetica,sans-serif;
-  background:linear-gradient(120deg,#141e30,#243b55);
-  color:#fff;
-  min-height:100vh;
-}
-.center{
-  min-height:100vh;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
-.login{
-  background:#1f2933;
-  padding:28px;
-  border-radius:18px;
-  width:100%;
-  max-width:320px;
-  text-align:center;
-}
-.login input,.login button{
-  width:100%;
-  padding:14px;
-  margin-top:10px;
-  border-radius:10px;
-  border:none;
-}
-.login button{background:#00b3ff;color:#fff;font-weight:bold}
-.dashboard{display:none;padding:20px}
-
-.summary{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:14px;
-  margin-bottom:18px;
-}
-.card{
-  background:#0f1b2d;
-  padding:16px;
-  border-radius:14px;
-}
-.main{display:grid;grid-template-columns:2fr 1fr;gap:20px}
-button{
-  border:none;
-  border-radius:999px;
-  padding:8px 14px;
-  font-weight:bold;
-  cursor:pointer;
-}
-.primary{background:#00b3ff;color:#fff}
-.danger{background:#e53935;color:#fff}
-.list{max-height:360px;overflow-y:auto;margin-top:10px}
-.row{border-bottom:1px solid rgba(255,255,255,.1);padding:8px 0;font-size:13px}
-.badge{font-size:10px;padding:2px 8px;border-radius:999px}
-.badge.ready{background:#4caf50}
-.badge.active{background:#00b3ff}
-</style>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ButterBean</title>
+  <link rel="manifest" href="/manifest.json">
+  <style>
+    :root{--accent1:#ff7a18;--accent2:#ff9f45;--muted:#e6d7c9}
+    *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
+    body{background:linear-gradient(180deg,#2d0b00,#3b1200);color:var(--muted);min-height:100vh}
+    .header{padding:24px;text-align:center}
+    .logo{width:220px}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;padding:24px;max-width:1100px;margin:0 auto}
+    .home-btn{padding:18px;border-radius:16px;border:none;background:linear-gradient(145deg,var(--accent1),var(--accent2));color:#fff;font-weight:800;cursor:pointer}
+    .footer{text-align:center;padding:18px 0;opacity:.8}
+  </style>
 </head>
-
 <body>
+  <div class="header"><img src="icons/logo.png" class="logo" alt="ButterBean"></div>
+  <div class="grid">
+    <button class="home-btn" onclick="location.href='app.html'">
+      <img src="icons/menu.png" width="24"><br>Menu
+    </button>
 
-<div class="center" id="loginScreen">
-  <div class="login">
-    <h3>Manager Login</h3>
-    <input type="password" id="pinInput" placeholder="PIN">
-    <button onclick="login()">Login</button>
+    <button class="home-btn" onclick="location.href='explore.html'">
+      <img src="icons/explore.png" width="24"><br>Explore
+    </button>
+
+    <button class="home-btn" onclick="location.href='accommodation.html'">
+      <img src="icons/stay.png" width="24"><br>Stay Nearby
+    </button>
+
+    <button class="home-btn" onclick="location.href='emergency.html'">
+      <img src="icons/emergency.png" width="24"><br>Emergency
+    </button>
+
+    <button class="home-btn" onclick="location.href='pos.html'">
+      <img src="icons/pos.png" width="24"><br>POS
+    </button>
   </div>
-</div>
 
-<div class="dashboard" id="dashboard">
-
-  <div class="summary">
-    <div class="card"><div>Today Revenue</div><h3 id="todayRevenue">R0</h3><div id="todayOrders">0 orders</div></div>
-    <div class="card"><div>Active / Ready</div><h3 id="activeCompleted">0 / 0</h3></div>
-    <div class="card"><div>Last 7 Days</div><h3 id="weekRevenue">R0</h3></div>
-    <div class="card"><div>Last 30 Days</div><h3 id="monthRevenue">R0</h3></div>
-  </div>
-
-  <div class="main">
-
-    <div class="card">
-      <h3>Today Orders</h3>
-      <button class="primary" onclick="exportToday()">Export CSV</button>
-      <button class="danger" onclick="clearVisual()">Clear View</button>
-      <div id="todayList" class="list"></div>
-
-      <h3 style="margin-top:20px;">Top Items</h3>
-      <div id="topItems"></div>
-    </div>
-
-    <div class="card">
-      <h3>Archive</h3>
-      <button class="danger" onclick="archiveToday()">Archive Ready Today</button>
-      <button class="primary" onclick="loadArchive()">Refresh Archive</button>
-      <div id="archiveList" class="list"></div>
-    </div>
-
-  </div>
-</div>
-
-<script>
-const MANAGER_PIN="7788";
-let db;
-
-function login(){
-  if(document.getElementById("pinInput").value===MANAGER_PIN){
-    document.getElementById("loginScreen").style.display="none";
-    document.getElementById("dashboard").style.display="block";
-    init();
-  }else alert("Wrong PIN");
-}
-
-function init(){
-  const config={
-    apiKey:"AIzaSyAG_RsdqHCslRR-xW2-3GrEKXn-UYAECYY",
-    authDomain:"butterbean-3869c.firebaseapp.com",
-    projectId:"butterbean-3869c"
-  };
-  if(!firebase.apps.length) firebase.initializeApp(config);
-  db=firebase.firestore();
-
-  loadToday();
-  loadArchive();
-  loadStats();
-}
-
-function getStartOfTodayTimestamp(){
-  const d=new Date();
-  d.setHours(0,0,0,0);
-  return firebase.firestore.Timestamp.fromDate(d);
-}
-
-function loadToday(){
-  const startTS=getStartOfTodayTimestamp();
-
-  db.collection("orders")
-    .where("created",">=",startTS)
-    .onSnapshot(snap=>{
-      let total=0,count=0,active=0,done=0;
-      const items={};
-      const list=document.getElementById("todayList");
-      list.innerHTML="";
-
-      snap.forEach(doc=>{
-        const o=doc.data();
-        count++;
-        total+=Number(o.total)||0;
-
-        if(o.status==="ready") done++; else active++;
-
-        (o.items||[]).forEach(i=>{
-          items[i.n]=(items[i.n]||0)+1;
-        });
-
-        const row=document.createElement("div");
-        row.className="row";
-        row.innerHTML=`<b>${o.customerName||"No Name"}</b> R${o.total}
-        <span class="badge ${o.status==="ready"?"ready":"active"}">${o.status}</span>`;
-        list.appendChild(row);
-      });
-
-      document.getElementById("todayRevenue").innerText="R"+total.toFixed(2);
-      document.getElementById("todayOrders").innerText=count+" orders";
-      document.getElementById("activeCompleted").innerText=active+" / "+done;
-
-      const top=document.getElementById("topItems");
-      top.innerHTML="";
-      Object.entries(items).sort((a,b)=>b[1]-a[1]).slice(0,5)
-        .forEach(i=>top.innerHTML+=`<div>${i[0]} (${i[1]})</div>`);
-    });
-}
-
-async function archiveToday(){
-  const startTS=getStartOfTodayTimestamp();
-
-  const snap=await db.collection("orders")
-    .where("created",">=",startTS)
-    .get();
-
-  if(snap.empty){
-    alert("No orders found for today.");
-    return;
-  }
-
-  const batch=db.batch();
-  let moved=0;
-
-  snap.forEach(doc=>{
-    const data=doc.data();
-    if(data.status==="ready"){
-      batch.set(
-        db.collection("orders_archive").doc(doc.id),
-        {...data,archivedAt:firebase.firestore.FieldValue.serverTimestamp()}
-      );
-      batch.delete(doc.ref);
-      moved++;
-    }
-  });
-
-  if(moved===0){
-    alert("No READY orders to archive.");
-    return;
-  }
-
-  await batch.commit();
-  alert(`Archived ${moved} order(s).`);
-  loadArchive();
-}
-
-async function loadArchive(){
-  const list=document.getElementById("archiveList");
-  list.innerHTML="Loading...";
-
-  const snap=await db.collection("orders_archive")
-    .orderBy("archivedAt","desc")
-    .limit(25)
-    .get();
-
-  list.innerHTML="";
-  if(snap.empty){
-    list.innerHTML="No archived orders yet.";
-    return;
-  }
-
-  snap.forEach(doc=>{
-    const d=doc.data();
-    list.innerHTML+=`<div class="row">R${d.total} – ${d.customerName||"No Name"}</div>`;
-  });
-}
-
-function clearVisual(){
-  document.getElementById("todayList").innerHTML="";
-}
-
-async function loadStats(){
-  const now=new Date();
-
-  const week=new Date(now);
-  week.setDate(week.getDate()-7);
-  const weekTS=firebase.firestore.Timestamp.fromDate(week);
-
-  const month=new Date(now);
-  month.setDate(month.getDate()-30);
-  const monthTS=firebase.firestore.Timestamp.fromDate(month);
-
-  const w=await db.collection("orders").where("created",">=",weekTS).get();
-  let wt=0; w.forEach(d=>wt+=Number(d.data().total)||0);
-  document.getElementById("weekRevenue").innerText="R"+wt.toFixed(2);
-
-  const m=await db.collection("orders").where("created",">=",monthTS).get();
-  let mt=0; m.forEach(d=>mt+=Number(d.data().total)||0);
-  document.getElementById("monthRevenue").innerText="R"+mt.toFixed(2);
-}
-
-async function exportToday(){
-  const startTS=getStartOfTodayTimestamp();
-  const snap=await db.collection("orders").where("created",">=",startTS).get();
-
-  let csv="Customer,Total,Status\n";
-  snap.forEach(d=>{
-    const o=d.data();
-    csv+=`${o.customerName},${o.total},${o.status}\n`;
-  });
-
-  const blob=new Blob([csv],{type:"text/csv"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download="today.csv";
-  a.click();
-}
-</script>
+  <div class="footer">ButterBean — Badplaas</div>
 </body>
 </html>
