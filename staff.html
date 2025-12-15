@@ -1,44 +1,235 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ButterBean</title>
-  <link rel="manifest" href="/manifest.json">
-  <style>
-    :root{--accent1:#ff7a18;--accent2:#ff9f45;--muted:#e6d7c9}
-    *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
-    body{background:linear-gradient(180deg,#2d0b00,#3b1200);color:var(--muted);min-height:100vh}
-    .header{padding:24px;text-align:center}
-    .logo{width:220px}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;padding:24px;max-width:1100px;margin:0 auto}
-    .home-btn{padding:18px;border-radius:16px;border:none;background:linear-gradient(145deg,var(--accent1),var(--accent2));color:#fff;font-weight:800;cursor:pointer}
-    .footer{text-align:center;padding:18px 0;opacity:.8}
-  </style>
+<meta charset="UTF-8">
+<title>ButterBean Staff Console</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<style>
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    background:linear-gradient(180deg,#2d0b00,#3b1200);
+    color:#fff;
+    font-family:Arial,Helvetica,sans-serif;
+    min-height:100vh;
+  }
+  .dashboard{
+    display:grid;
+    grid-template-columns:320px 1fr 1fr;
+    gap:20px;
+    padding:20px;
+    height:100vh;
+  }
+  .panel{
+    background:linear-gradient(180deg,#3b1300,#2a0e00);
+    border-radius:14px;
+    padding:18px;
+    overflow:hidden;
+  }
+  h2{color:#ffdcb8;text-align:center}
+
+  input, button{
+    width:100%;
+    padding:10px;
+    border-radius:10px;
+    border:none;
+    margin-top:8px;
+  }
+  button{
+    cursor:pointer;
+    background:linear-gradient(90deg,#ff7a18,#ff9f45);
+    color:#fff;
+    font-weight:bold;
+  }
+
+  .orderCard{
+    background:rgba(255,255,255,0.05);
+    border-radius:12px;
+    padding:12px;
+    margin-bottom:12px;
+  }
+  .orderCard.ready{
+    background:rgba(25,160,90,0.08);
+  }
+
+  .orderButtons{
+    display:flex;
+    gap:10px;
+    margin-top:10px;
+  }
+
+  .listArea{
+    max-height:78vh;
+    overflow:auto;
+  }
+</style>
 </head>
+
 <body>
-  <div class="header"><img src="icons/logo.png" class="logo" alt="ButterBean"></div>
-  <div class="grid">
-    <button class="home-btn" onclick="location.href='app.html'">
-      <img src="icons/menu.png" width="24"><br>Menu
-    </button>
+<div class="dashboard">
 
-    <button class="home-btn" onclick="location.href='explore.html'">
-      <img src="icons/explore.png" width="24"><br>Explore
-    </button>
+  <!-- LEFT PANEL -->
+  <div class="panel">
+    <h2>Staff Console</h2>
 
-    <button class="home-btn" onclick="location.href='accommodation.html'">
-      <img src="icons/stay.png" width="24"><br>Stay Nearby
-    </button>
+    <!-- Loyalty Pin -->
+    <h3 style="color:#ffdcb8">Generate Loyalty Code</h3>
+    <input id="staffPin" type="password" placeholder="Enter Staff PIN">
+    <button id="genBtn">Generate Code</button>
+    <div id="codeOutput" style="margin-top:8px;color:#ffdcb8"></div>
 
-    <button class="home-btn" onclick="location.href='emergency.html'">
-      <img src="icons/emergency.png" width="24"><br>Emergency
-    </button>
-
-    <button class="home-btn" onclick="location.href='pos.html'">
-      <img src="icons/pos.png" width="24"><br>POS
-    </button>
+    <!-- Daily Special -->
+    <h3 style="color:#ffdcb8;margin-top:18px;">Today's Special</h3>
+    <input id="newSpecialText" placeholder="e.g. Cappuccino + Muffin R35">
+    <button id="updateSpecialBtn">Save Today’s Special</button>
   </div>
 
-  <div class="footer">ButterBean — Badplaas</div>
+  <!-- LIVE ORDERS -->
+  <div class="panel">
+    <h3 style="color:#ffdcb8">Live Orders</h3>
+    <div id="ordersContainer" class="listArea"></div>
+  </div>
+
+  <!-- COMPLETED -->
+  <div class="panel">
+    <h3 style="color:#ffdcb8">Completed Orders</h3>
+    <button style="background:#e53935;color:#fff;" onclick="clearCompleted()">Clear Completed</button>
+    <div id="completedContainer" class="listArea" style="margin-top:10px;"></div>
+  </div>
+
+</div>
+
+<!-- SOUND -->
+<audio id="newOrderSound"
+  src="https://assets.mixkit.co/sfx/preview/mixkit-fast-double-click-on-mouse-275.wav"></audio>
+
+<script>
+/* ------------------ Firebase Init ------------------ */
+const firebaseConfig = {
+  apiKey: "AIzaSyAG_RsdqHCslRR-xW2-3GrEKXn-UYAECYY",
+  authDomain: "butterbean-3869c.firebaseapp.com",
+  projectId: "butterbean-3869c",
+  storageBucket: "butterbean-3869c.firebasestorage.app",
+  messagingSenderId: "329727412036",
+  appId: "1:329727412036:web:7e41bebb8094fb70847911"
+};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+/* ------------------ Settings ------------------ */
+const STAFF_PIN = "1942";
+
+/* ------------------ Loyalty Code Generator ------------------ */
+document.getElementById("genBtn").onclick = async () => {
+  const pin = document.getElementById("staffPin").value;
+  if(pin !== STAFF_PIN){
+    alert("Incorrect PIN");
+    return;
+  }
+  const code = Math.floor(100000 + Math.random()*900000).toString();
+  await db.collection("stamp_codes").add({
+    code,
+    used:false,
+    created: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  document.getElementById("codeOutput").innerText = code;
+};
+
+/* ------------------ Update Today's Special ------------------ */
+document.getElementById("updateSpecialBtn").onclick = async () => {
+  const txt = document.getElementById("newSpecialText").value.trim();
+  if(!txt) return alert("Enter a special");
+  await db.collection("daily_special").doc("today").set({
+    text: txt,
+    updated: firebase.firestore.FieldValue.serverTimestamp()
+  });
+  alert("Special saved");
+};
+
+/* ------------------ Live Orders Listener ------------------ */
+let firstLoad = true;
+
+db.collection("orders").orderBy("created","desc").onSnapshot(snapshot=>{
+  const live = document.getElementById("ordersContainer");
+  const done = document.getElementById("completedContainer");
+  live.innerHTML = "";
+  done.innerHTML = "";
+
+  if(!firstLoad){
+    document.getElementById("newOrderSound").play().catch(()=>{});
+  }
+  firstLoad = false;
+
+  snapshot.forEach(doc=>{
+    const o = doc.data();
+    const id = doc.id;
+
+    // ❗ DO NOT show WhatsApp POS orders to staff
+    if(o.source === "pos_whatsapp" || o.notifyStaff === false) return;
+
+    const card = document.createElement("div");
+    card.className = "orderCard";
+    if(o.status === "ready") card.classList.add("ready");
+
+    card.innerHTML = `
+      <strong>${o.customerName || "No Name"}</strong><br>
+      <small>${o.phone || ""}</small><br><br>
+      ${(o.items||[]).map(i => `${i.n} (R${i.p})`).join("<br>")}<br><br>
+      <strong>Total: R${o.total}</strong>
+    `;
+
+    if(o.status !== "ready"){
+      const btns = document.createElement("div");
+      btns.className = "orderButtons";
+
+      btns.innerHTML = `
+        <button onclick="updateOrderStatus('${id}','preparing')">Preparing</button>
+        <button style="background:#19a05a;color:#fff"
+                onclick="updateOrderStatus('${id}','ready')">Complete</button>
+      `;
+      card.appendChild(btns);
+      live.appendChild(card);
+    } else {
+      done.appendChild(card);
+    }
+  });
+});
+
+/* ------------------ Update Order Status + WhatsApp Notify ------------------ */
+async function updateOrderStatus(id, status){
+  const ref = db.collection("orders").doc(id);
+  const snap = await ref.get();
+  if(!snap.exists) return;
+
+  const data = snap.data();
+  await ref.update({status});
+
+  if(data.phone){
+    const clean = data.phone.replace(/[^0-9]/g,"");
+    let msg = "";
+    if(status === "preparing") msg = "Your ButterBean order is now being prepared ☕";
+    if(status === "ready") msg = "Your ButterBean order is READY for pickup ✅";
+
+    window.open(`https://wa.me/${clean}?text=${encodeURIComponent(msg)}`,"_blank");
+  }
+}
+
+/* ------------------ Clear Completed Orders ------------------ */
+async function clearCompleted(){
+  if(!confirm("Clear completed orders?")) return;
+
+  const snap = await db.collection("orders").where("status","==","ready").get();
+  const batch = db.batch();
+  snap.forEach(d=> batch.delete(d.ref));
+  await batch.commit();
+
+  alert("Completed orders cleared");
+}
+</script>
 </body>
 </html>

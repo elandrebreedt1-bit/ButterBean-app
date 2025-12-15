@@ -1,44 +1,576 @@
-﻿<!doctype html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>ButterBean</title>
-  <link rel="manifest" href="/manifest.json">
-  <style>
-    :root{--accent1:#ff7a18;--accent2:#ff9f45;--muted:#e6d7c9}
-    *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
-    body{background:linear-gradient(180deg,#2d0b00,#3b1200);color:var(--muted);min-height:100vh}
-    .header{padding:24px;text-align:center}
-    .logo{width:220px}
-    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;padding:24px;max-width:1100px;margin:0 auto}
-    .home-btn{padding:18px;border-radius:16px;border:none;background:linear-gradient(145deg,var(--accent1),var(--accent2));color:#fff;font-weight:800;cursor:pointer}
-    .footer{text-align:center;padding:18px 0;opacity:.8}
-  </style>
+<meta charset="UTF-8">
+<title>ButterBean Manager Portal</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- FIREBASE -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;font-family:Arial,Helvetica,sans-serif}
+
+  body{
+    background:linear-gradient(180deg,#2d0b00,#3b1200);
+    color:#e6d7c9;
+    min-height:100vh;
+    padding-bottom:40px;
+  }
+
+  /* LOGIN */
+  #loginScreen{
+    display:flex;justify-content:center;align-items:center;height:100vh;
+  }
+  .login-box{
+    background:linear-gradient(180deg,#3b1300,#2a0e00);
+    padding:24px;border-radius:16px;text-align:center;
+    width:100%;max-width:360px;
+  }
+  input, button{
+    width:100%;padding:12px;margin-top:10px;
+    border-radius:10px;border:none;font-weight:bold;
+  }
+  button{
+    cursor:pointer;color:#fff;
+    background:linear-gradient(90deg,#ff7a18,#ff9f45);
+  }
+  button.danger{background:#e53935;}
+
+  /* DASHBOARD */
+  #dashboard{display:none;padding:20px;}
+
+  .summary{
+    display:grid;grid-template-columns:repeat(4,1fr);
+    gap:14px;margin-bottom:20px;
+  }
+  .card{
+    background:linear-gradient(180deg,#3b1300,#2a0e00);
+    padding:16px;border-radius:12px;
+  }
+  h3{color:#ffdcb8;margin-bottom:8px}
+  .muted{color:rgba(255,255,255,0.6);font-size:13px}
+
+  .main{
+    display:grid;grid-template-columns:2fr 1fr;gap:20px;
+  }
+
+  /* TODAY ORDERS */
+  .todayList{
+    max-height:360px;overflow:auto;margin-top:10px;
+    border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;
+  }
+  .row{
+    padding:8px 0;border-bottom:1px solid rgba(255,255,255,0.05);
+  }
+  .badge{
+    padding:4px 10px;border-radius:999px;font-size:11px;margin-left:10px;
+  }
+  .active{background:#ff9f45;color:#111;}
+  .ready{background:#19a05a;color:#fff;}
+
+  /* ARCHIVE & PAYOUTS */
+  .archiveList{
+    max-height:200px;overflow:auto;margin-top:10px;
+    border-top:1px solid rgba(255,255,255,0.1);padding-top:8px;
+  }
+
+  /* PAYOUT FORMS FIXED */
+  .payoutForm{
+    display:flex;width:100%;gap:10px;margin-top:10px;
+  }
+  .payoutForm input{
+    flex:1;min-width:0;padding:12px;border-radius:10px;
+    border:none;font-size:16px;background:#fff;color:#000;
+  }
+  .payoutForm button{
+    flex-shrink:0;width:100px;padding:12px;
+    border-radius:10px;border:none;font-size:14px;
+    background:linear-gradient(90deg,#ff7a18,#ff9f45);
+    color:white;cursor:pointer;
+  }
+
+  /* PAYOUTS EXTENDED LIST */
+  #allPayoutsContainer{
+    display:none;
+    max-height:200px;
+    overflow:auto;
+    margin-top:10px;
+    border-top:1px solid rgba(255,255,255,0.1);
+    padding-top:8px;
+  }
+
+  .toggleBtn{
+    background:#444;border:none;border-radius:8px;
+    padding:10px;margin-top:8px;width:100%;color:#fff;
+    cursor:pointer;font-weight:bold;
+  }
+
+  @media(max-width:1000px){
+    .main{grid-template-columns:1fr;}
+  }
+</style>
 </head>
+
 <body>
-  <div class="header"><img src="icons/logo.png" class="logo" alt="ButterBean"></div>
-  <div class="grid">
-    <button class="home-btn" onclick="location.href='app.html'">
-      <img src="icons/menu.png" width="24"><br>Menu
-    </button>
 
-    <button class="home-btn" onclick="location.href='explore.html'">
-      <img src="icons/explore.png" width="24"><br>Explore
-    </button>
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <h2 style="color:#ffdcb8">Manager Login</h2>
+    <input id="pinInput" type="password" placeholder="Enter Manager PIN">
+    <button onclick="login()">Login</button>
+  </div>
+</div>
 
-    <button class="home-btn" onclick="location.href='accommodation.html'">
-      <img src="icons/stay.png" width="24"><br>Stay Nearby
-    </button>
+<!-- DASHBOARD -->
+<div id="dashboard">
 
-    <button class="home-btn" onclick="location.href='emergency.html'">
-      <img src="icons/emergency.png" width="24"><br>Emergency
-    </button>
-
-    <button class="home-btn" onclick="location.href='pos.html'">
-      <img src="icons/pos.png" width="24"><br>POS
-    </button>
+  <!-- SUMMARY BAR -->
+  <div class="summary">
+    <div class="card">
+      <div class="muted">Today Revenue (gross)</div>
+      <h3 id="todayRevenue">R0.00</h3>
+    </div>
+    <div class="card">
+      <div class="muted">Net After Payouts</div>
+      <h3 id="todayNet">R0.00</h3>
+      <div class="muted" id="payoutsTotal">Payouts: R0.00</div>
+    </div>
+    <div class="card">
+      <div class="muted">Last 7 Days</div>
+      <h3 id="weekRevenue">R0.00</h3>
+    </div>
+    <div class="card">
+      <div class="muted">Last 30 Days</div>
+      <h3 id="monthRevenue">R0.00</h3>
+    </div>
   </div>
 
-  <div class="footer">ButterBean — Badplaas</div>
+  <div class="main">
+
+    <!-- TODAY ORDERS COLUMN -->
+    <div class="card">
+
+      <h3>Today Orders</h3>
+      <div class="muted">Active walk-in/POS orders (WhatsApp duplicates hidden)</div>
+
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button onclick="exportToday()">Export CSV</button>
+        <button onclick="refreshToday()">Refresh</button>
+      </div>
+
+      <div id="todayList" class="todayList"></div>
+
+      <h3 style="margin-top:16px">Top Items</h3>
+      <div id="topItems" class="muted" style="line-height:20px;"></div>
+
+    </div>
+
+    <!-- RIGHT COLUMN -->
+    <div class="card">
+
+      <h3>Archive</h3>
+      <div class="muted">Latest archived orders</div>
+
+      <div style="display:flex;gap:10px;margin-top:8px">
+        <button class="danger" onclick="archiveReady()">Archive READY</button>
+        <button onclick="loadArchive()">Refresh</button>
+      </div>
+
+      <div id="archiveList" class="archiveList"></div>
+
+      <!-- PAYOUT SECTION -->
+      <h3 style="margin-top:20px">Payouts</h3>
+      <div class="muted">Record cash taken out (ingredients, stock, expenses)</div>
+
+      <!-- INPUT ROW -->
+      <div class="payoutForm">
+        <input id="payoutAmount" type="number" step="0.01" placeholder="Amount (R)">
+        <input id="payoutNote" type="text" placeholder="Reason">
+        <button onclick="addPayout()">Add</button>
+      </div>
+
+      <!-- Today's Payouts -->
+      <div class="muted" style="margin-top:10px">Today's Payouts</div>
+      <div id="payoutList" class="archiveList" style="max-height:150px;"></div>
+
+      <!-- Toggle all payouts -->
+      <button class="toggleBtn" onclick="toggleAllPayouts()">Show All Payouts</button>
+      <div id="allPayoutsContainer"></div>
+
+      <!-- END OF DAY -->
+      <h3 style="margin-top:20px">End of Day</h3>
+      <button onclick="printDailyReport()">Print Daily Report</button>
+      <button onclick="clearVisual()" style="margin-top:8px;background:#666">Clear View</button>
+
+    </div>
+
+  </div>
+</div>
+
+<script>
+// FIREBASE SETUP
+const MANAGER_PIN = "7788";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyAG_RsdqHCslRR-xW2-3GrEKXn-UYAECYY",
+  authDomain:"butterbean-3869c.firebaseapp.com",
+  projectId:"butterbean-3869c",
+  storageBucket:"butterbean-3869c.firebasestorage.app",
+  messagingSenderId:"329727412036",
+  appId:"1:329727412036:web:7e41bebb8094fb70847911"
+};
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+
+// LOGIN
+function login(){
+  const pin = document.getElementById("pinInput").value;
+  if(pin !== MANAGER_PIN) return alert("Incorrect PIN");
+
+  document.getElementById("loginScreen").style.display="none";
+  document.getElementById("dashboard").style.display="block";
+
+  initManager();
+}
+
+// HELPERS
+function startOfTodayTS(){
+  const d = new Date(); d.setHours(0,0,0,0);
+  return firebase.firestore.Timestamp.fromDate(d);
+}
+
+// INIT
+function initManager(){
+  loadTodayLive();
+  loadArchive();
+  loadPayouts();
+  loadStats();
+}
+
+/* ============================================
+   TODAY ORDERS (LIVE)
+============================================ */
+let todayUnsub = null;
+
+function loadTodayLive(){
+  if(todayUnsub) todayUnsub();
+
+  const start = startOfTodayTS();
+
+  todayUnsub = db.collection("orders")
+    .where("created",">=",start)
+    .orderBy("created","desc")
+    .onSnapshot(snapshot=>{
+      let gross = 0;
+      let itemMap = {};
+      const list = document.getElementById("todayList");
+      list.innerHTML = "";
+
+      snapshot.forEach(doc=>{
+        const o = doc.data();
+        gross += Number(o.total)||0;
+
+        // Skip WhatsApp-POS duplicates in visible list
+        const hidden = (
+          o.source === "pos_whatsapp" ||
+          o.notifyStaff === false ||
+          o.status === "completed_whatsapp"
+        );
+        if(hidden) return;
+
+        (o.items||[]).forEach(i=>{
+          itemMap[i.n] = (itemMap[i.n]||0) + (i.qty||1);
+        });
+
+        const row = document.createElement("div");
+        row.className = "row";
+        row.innerHTML = `
+          <strong>${o.customerName||"No Name"}</strong> — R${(o.total||0).toFixed(2)}
+          <span class="badge ${o.status==="ready"?"ready":"active"}">${o.status}</span>
+          <div class="muted" style="margin-top:5px">${(o.items||[]).map(i=>`${i.n} x${i.qty||1}`).join("<br>")}</div>
+        `;
+        list.appendChild(row);
+      });
+
+      document.getElementById("todayRevenue").innerText = "R" + gross.toFixed(2);
+
+      updateNetDisplay();
+      updateTopItems(itemMap);
+    });
+}
+
+function refreshToday(){ loadTodayLive(); }
+
+function updateTopItems(map){
+  const el = document.getElementById("topItems");
+  el.innerHTML = "";
+  Object.entries(map).sort((a,b)=>b[1]-a[1]).slice(0,10)
+    .forEach(([name,c])=>{
+      el.innerHTML += `${name} (${c})<br>`;
+    });
+}
+
+/* ============================================
+   STATS (7 day / 30 day)
+============================================ */
+async function loadStats(){
+  const now = new Date();
+
+  let week = new Date(now); week.setDate(week.getDate()-7);
+  let month = new Date(now); month.setDate(month.getDate()-30);
+
+  const weekSnap = await db.collection("orders")
+    .where("created",">=",firebase.firestore.Timestamp.fromDate(week))
+    .get();
+
+  let w=0;
+  weekSnap.forEach(d=>w += Number(d.data().total)||0);
+  document.getElementById("weekRevenue").innerText = "R"+w.toFixed(2);
+
+  const monthSnap = await db.collection("orders")
+    .where("created",">=",firebase.firestore.Timestamp.fromDate(month))
+    .get();
+
+  let m=0;
+  monthSnap.forEach(d=>m += Number(d.data().total)||0);
+  document.getElementById("monthRevenue").innerText = "R"+m.toFixed(2);
+}
+
+/* ============================================
+   ARCHIVE
+============================================ */
+async function archiveReady(){
+  if(!confirm("Archive READY orders?")) return;
+
+  const start = startOfTodayTS();
+  const snap = await db.collection("orders")
+    .where("created",">=",start)
+    .where("status","==","ready")
+    .get();
+
+  if(snap.empty) return alert("No ready orders.");
+
+  const batch = db.batch();
+  let moved=0;
+
+  snap.forEach(doc=>{
+    batch.set(db.collection("orders_archive").doc(doc.id),{
+      ...doc.data(),
+      archivedAt:firebase.firestore.FieldValue.serverTimestamp()
+    });
+    batch.delete(doc.ref);
+    moved++;
+  });
+
+  await batch.commit();
+  alert(`Archived ${moved} order(s).`);
+  loadArchive();
+}
+
+async function loadArchive(){
+  const list = document.getElementById("archiveList");
+  list.innerHTML = "Loading…";
+
+  const snap = await db.collection("orders_archive")
+    .orderBy("archivedAt","desc")
+    .limit(30)
+    .get();
+
+  list.innerHTML = "";
+
+  if(snap.empty){ list.innerHTML="No archived orders."; return; }
+
+  snap.forEach(doc=>{
+    const o = doc.data();
+    const row = document.createElement("div");
+    row.className="row";
+    const when = o.archivedAt?.toDate()?.toLocaleString()||"";
+    row.innerHTML = `R${o.total||0} — ${o.customerName||""}<div class="muted">${when}</div>`;
+    list.appendChild(row);
+  });
+}
+
+/* ============================================
+   PAYOUTS (TODAY + ALL)
+============================================ */
+async function addPayout(){
+  const amt = parseFloat(document.getElementById("payoutAmount").value);
+  const note = document.getElementById("payoutNote").value.trim();
+  if(!amt){ alert("Enter a valid amount"); return; }
+
+  await db.collection("payouts").add({
+    amount:amt,
+    note,
+    created:firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  document.getElementById("payoutAmount").value="";
+  document.getElementById("payoutNote").value="";
+
+  loadPayouts();
+  updateNetDisplay();
+
+  alert("Payout added");
+}
+
+async function loadPayouts(){
+  const start = startOfTodayTS();
+  const snap = await db.collection("payouts")
+    .where("created",">=",start)
+    .orderBy("created","desc")
+    .get();
+
+  const list = document.getElementById("payoutList");
+  list.innerHTML = "";
+
+  let total=0;
+
+  snap.forEach(doc=>{
+    const p = doc.data();
+    total += Number(p.amount)||0;
+    const when = p.created?.toDate()?.toLocaleTimeString()||"";
+    list.innerHTML += `<div class="row">- R${p.amount.toFixed(2)} — ${p.note}<div class="muted">${when}</div></div>`;
+  });
+
+  window._todayPayouts = total;
+  document.getElementById("payoutsTotal").innerText = "Payouts: R" + total.toFixed(2);
+
+  updateNetDisplay();
+}
+
+/* ============================================
+   ALL PAYOUTS TOGGLE
+============================================ */
+let showingAll = false;
+
+async function toggleAllPayouts(){
+  const container = document.getElementById("allPayoutsContainer");
+  const btn = document.querySelector(".toggleBtn");
+
+  if(showingAll){
+    // hide
+    showingAll = false;
+    container.style.display="none";
+    btn.textContent = "Show All Payouts";
+    return;
+  }
+
+  // show all payouts
+  showingAll = true;
+  container.style.display="block";
+  container.innerHTML = "Loading...";
+
+  const snap = await db.collection("payouts")
+    .orderBy("created","desc")
+    .limit(200)
+    .get();
+
+  container.innerHTML = "";
+
+  if(snap.empty){
+    container.innerHTML = "No payouts recorded.";
+    return;
+  }
+
+  snap.forEach(doc=>{
+    const p = doc.data();
+    const when = p.created?.toDate()?.toLocaleString()||"";
+    container.innerHTML += `
+      <div class="row">R${p.amount.toFixed(2)} — ${p.note} 
+      <div class="muted">${when}</div></div>`;
+  });
+
+  btn.textContent = "Hide All Payouts";
+}
+
+/* ============================================
+   NET CALCULATION
+============================================ */
+function updateNetDisplay(){
+  const gross = parseFloat(document.getElementById("todayRevenue").innerText.replace("R",""))||0;
+  const payouts = Number(window._todayPayouts||0);
+  const net = Math.max(0, gross - payouts);
+  document.getElementById("todayNet").innerText = "R" + net.toFixed(2);
+}
+
+/* ============================================
+   EXPORT & PRINT DAILY REPORT
+============================================ */
+async function exportToday(){
+  const start = startOfTodayTS();
+  const snap = await db.collection("orders").where("created",">=",start).get();
+  let csv = "OrderID,Customer,Total,Status,Source\n";
+
+  snap.forEach(doc=>{
+    const o = doc.data();
+    csv += `${doc.id},"${o.customerName||""}",${o.total},${o.status},${o.source}\n`;
+  });
+
+  const blob = new Blob([csv],{type:"text/csv"});
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "today_orders.csv";
+  a.click();
+}
+
+async function printDailyReport(){
+  const start = startOfTodayTS();
+  const orders = await db.collection("orders").where("created",">=",start).get();
+  const payouts = await db.collection("payouts").where("created",">=",start).get();
+
+  let ordersHTML="", payoutsHTML="";
+  let gross=0, payoutTotal=0;
+
+  orders.forEach(doc=>{
+    const o = doc.data();
+    gross += Number(o.total)||0;
+    ordersHTML += `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:4px 0">
+      <span>${o.customerName||""}</span><span>R${(o.total||0).toFixed(2)}</span>
+    </div>`;
+  });
+
+  payouts.forEach(doc=>{
+    const p = doc.data();
+    payoutTotal += Number(p.amount)||0;
+    payoutsHTML += `<div style="display:flex;justify-content:space-between;border-bottom:1px solid #ddd;padding:4px 0">
+      <span>${p.note||""}</span><span>-R${(p.amount||0).toFixed(2)}</span>
+    </div>`;
+  });
+
+  const net = gross - payoutTotal;
+  const now = new Date().toLocaleString();
+
+  const win = window.open("","_blank");
+  win.document.write(`
+    <html><head><title>Daily Report</title></head><body>
+    <h1>ButterBean — Daily Report</h1>
+    <div>${now}</div>
+
+    <h2>Orders</h2>
+    ${ordersHTML}
+    <h3>Gross: R${gross.toFixed(2)}</h3>
+
+    <h2>Payouts</h2>
+    ${payoutsHTML}
+    <h3>Total Payouts: R${payoutTotal.toFixed(2)}</h3>
+
+    <h2>Net Revenue</h2>
+    <h3>R${net.toFixed(2)}</h3>
+
+    </body></html>
+  `);
+  win.print();
+}
+
+function clearVisual(){
+  document.getElementById("todayList").innerHTML="";
+  document.getElementById("archiveList").innerHTML="";
+}
+
+</script>
+
 </body>
 </html>
